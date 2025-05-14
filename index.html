@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Personnel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Mon Pomodoro</h1>
+
+        <div class="timer">
+            <span id="minutes">25</span>:<span id="seconds">00</span>
+        </div>
+
+        <div class="controls">
+            <button id="start">Démarrer</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Réinitialiser</button>
+        </div>
+
+        <div class="current-task-display" id="current-task-display-area">
+            <span id="active-task-name"></span>
+            <!-- Le champ de saisie sera toujours là pour entrer une nouvelle tâche -->
+        </div>
+
+        <div class="task-input">
+            <input type="text" id="task-name" placeholder="Nouvelle tâche ? (Entrée pour valider)">
+        </div>
+
+        <div class="duration-settings">
+            <span class="duration-label">Travail: <span id="disp-work-duration" class="editable-duration" data-duration-type="work">25</span> min</span>
+            <span class="duration-label">Courte Pause: <span id="disp-short-break-duration" class="editable-duration" data-duration-type="shortBreak">5</span> min</span>
+            <span class="duration-label">Longue Pause: <span id="disp-long-break-duration" class="editable-duration" data-duration-type="longBreak">15</span> min</span>
+        </div>
+
+        <div class="counters">
+            <p>Pomodoros complétés : <span id="pomodoro-count">0</span></p>
+            <p>Cycle actuel : <span id="current-cycle">Travail</span></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

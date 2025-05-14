@@ -1,0 +1,436 @@
+/* @keyframes subtleBackgroundAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+} */ /* Removed as Vanta.js will handle the background */
+
+:root {
+    --container-bg: rgba(28, 28, 30, 0.7);
+    --container-border-color: rgba(255, 255, 255, 0.1);
+    --container-glow-color: rgba(120, 120, 200, 0.1);
+    --text-color-primary: #F5F5F7;
+    --text-color-secondary: rgba(235, 235, 245, 0.7);
+
+    --work-glow-color-rgb: 48, 209, 88; /* iOS Green */
+    --short-break-glow-color-rgb: 10, 132, 255; /* iOS Blue */
+    --long-break-glow-color-rgb: 255, 159, 10; /* iOS Orange */
+    --default-glow-color-rgb: 100, 100, 120;
+}
+
+@keyframes subtleGlowPulse {
+    0% { box-shadow: 0 0 15px 3px var(--current-glow-shadow, rgba(var(--default-glow-color-rgb), 0.1)), 0 10px 30px rgba(0,0,0,0.3); }
+    50% { box-shadow: 0 0 25px 8px var(--current-glow-shadow, rgba(var(--default-glow-color-rgb), 0.15)), 0 10px 35px rgba(0,0,0,0.35); }
+    100% { box-shadow: 0 0 15px 3px var(--current-glow-shadow, rgba(var(--default-glow-color-rgb), 0.1)), 0 10px 30px rgba(0,0,0,0.3); }
+}
+
+@keyframes timerGlowActive {
+    0% { text-shadow: 0 0 15px var(--current-timer-glow, rgba(var(--work-glow-color-rgb), 0.5)), 0 2px 4px rgba(0,0,0,0.3); }
+    50% { text-shadow: 0 0 25px var(--current-timer-glow, rgba(var(--work-glow-color-rgb), 0.7)), 0 2px 6px rgba(0,0,0,0.35); }
+    100% { text-shadow: 0 0 15px var(--current-timer-glow, rgba(var(--work-glow-color-rgb), 0.5)), 0 2px 4px rgba(0,0,0,0.3); }
+}
+
+@keyframes modeTransitionSweep {
+    0% {
+        box-shadow: 0 0 15px 3px var(--current-glow-shadow, rgba(var(--default-glow-color-rgb),0.1)),
+                    0 10px 30px rgba(0,0,0,0.3),
+                    inset 0 0 0 0 rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.3);
+    }
+    50% {
+        box-shadow: 0 0 25px 8px var(--current-glow-shadow, rgba(var(--current-glow-color-rgb),0.15)),
+                    0 10px 35px rgba(0,0,0,0.35),
+                    inset 0 0 80px 0px rgba(var(--current-glow-color-rgb, var(--current-glow-color-rgb)), 0.5); /* Highlight sweep */
+    }
+    100% {
+        box-shadow: 0 0 15px 3px var(--current-glow-shadow, rgba(var(--current-glow-color-rgb),0.1)),
+                    0 10px 30px rgba(0,0,0,0.3),
+                    inset 0 0 0 0 rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.3);
+    }
+}
+
+@keyframes activeTaskAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+body {
+    font-family: 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #000000; /* Fallback solid black background */
+    /* background: linear-gradient(270deg, #101010, #1a1a1a, #101010); */ /* Removed */
+    /* background-size: 600% 600%; */ /* Removed */
+    /* animation: subtleBackgroundAnimation 25s ease infinite; */ /* Removed */
+    color: var(--text-color-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    /* transition: background-color 0.8s ease; */ /* Less relevant with Vanta */
+    overflow: hidden; /* Prevents scrollbars if Vanta overflows slightly */
+}
+
+.container {
+    background: linear-gradient(145deg, rgba(45, 45, 48, 0.75), rgba(20, 20, 22, 0.85));
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
+    padding: 30px 40px; /* Reduced padding */
+    border-radius: 30px;
+    text-align: center;
+    width: 420px;
+    max-height: 85vh; /* Added max-height */
+    overflow-y: auto; /* Added overflow-y */
+    border: 1px solid var(--container-border-color);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Reduced gap */
+    /* Initial shadow, will be animated */
+    box-shadow: 0 0 15px 3px var(--current-glow-shadow, rgba(var(--default-glow-color-rgb),0.1)), 0 10px 30px rgba(0,0,0,0.3);
+    animation: subtleGlowPulse 6s ease-in-out infinite;
+    transition: box-shadow 0.5s ease-out; /* For mode changes */
+}
+
+.container.mode-transitioning {
+    animation: modeTransitionSweep 0.8s ease-out forwards;
+}
+
+h1 {
+    color: var(--text-color-primary);
+    margin-bottom: 0;
+    font-size: 2.8em;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-shadow: 0 0 10px rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.3), 0 1px 2px rgba(0,0,0,0.5);
+    transition: text-shadow 0.5s ease-out; /* For mode changes on H1 glow */
+}
+
+.timer {
+    font-size: 7em;
+    font-weight: 600;
+    margin-bottom: 0;
+    line-height: 1;
+    color: var(--current-timer-color, #30D158);
+    transition: color 0.8s ease, text-shadow 0.5s ease-out;
+    /* Initial text-shadow, will be animated if .timer-active is present */
+    text-shadow: 0 0 15px var(--current-timer-glow, rgba(var(--work-glow-color-rgb), 0.5)), 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.timer-active .timer {
+    animation: timerGlowActive 3s ease-in-out infinite;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.controls button {
+    flex-grow: 1;
+    max-width: 170px;
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Slightly more visible default border */
+    padding: 18px 25px;
+    font-size: 1.1em;
+    border-radius: 18px;
+    font-weight: 500;
+    color: var(--text-color-secondary); /* Lighter default text */
+    background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0px rgba(255,255,255,0.03);
+    transition: all 0.2s ease-out; /* Slightly faster, cleaner transition */
+    cursor: pointer;
+}
+
+.controls button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.05);
+    border-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.4);
+    color: var(--text-color-primary);
+}
+
+.controls button:active:not(:disabled) {
+    transform: translateY(0px) scale(0.98);
+    background: linear-gradient(145deg, rgba(0,0,0,0.01), rgba(0,0,0,0.03));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25), inset 0 1px 2px rgba(0,0,0,0.1);
+    color: var(--text-color-secondary);
+}
+
+/* Styles for SPECIFIC, COLORED action buttons (Start, Pause, Reset) */
+.controls button#start:not(:disabled),
+.controls button#pause:not(:disabled),
+.controls button#reset {
+    color: #ffffff; /* Default white text for colored buttons, can be overridden */
+    border-width: 1px; /* Ensure border is consistently applied */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25), /* Base shadow */
+                inset 0 1px 1px rgba(255,255,255,0.15), /* Inner highlight */
+                inset 0 -1px 1px rgba(0,0,0,0.1); /* Inner bottom shadow */
+}
+
+/* Hover states for colored buttons */
+.controls button#start:hover:not(:disabled),
+.controls button#pause:hover:not(:disabled),
+.controls button#reset:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3), /* Enhanced outer shadow */
+                inset 0 1px 1px rgba(255,255,255,0.2), 
+                inset 0 -1px 1px rgba(0,0,0,0.15);
+    /* Border color will be inherited from mode-specific or button-specific styles below */
+}
+
+/* Active states for colored buttons */
+.controls button#start:active:not(:disabled),
+.controls button#pause:active:not(:disabled),
+.controls button#reset:active:not(:disabled) {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3), /* Pressed shadow */
+                inset 0 1px 2px rgba(0,0,0,0.2), 
+                inset 0 -1px 1px rgba(255,255,255,0.05); 
+}
+
+/* --- Mode/Button Specific Colors & Gradients --- */
+body.work-mode .controls button#start:not(:disabled) {
+    background: linear-gradient(145deg, #30D158, #27A84C);
+    border-color: #259643;
+    color: #ffffff;
+}
+body.short-break-mode .controls button#start:not(:disabled) {
+    background: linear-gradient(145deg, #0A84FF, #0070DD);
+    border-color: #0062C4;
+    color: #ffffff;
+}
+body.long-break-mode .controls button#start:not(:disabled) {
+    background: linear-gradient(145deg, #FF9F0A, #E89100);
+    border-color: #D97706;
+    color: #000000; /* Black text for better contrast on Amber */
+}
+
+#pause:not(:disabled) {
+    background: linear-gradient(145deg, #FF453A, #E03C32);
+    border-color: #C73028;
+    color: #ffffff;
+}
+#reset {
+    background: linear-gradient(145deg, #8E8E93, #75757A);
+    border-color: #636366;
+    color: #ffffff;
+}
+
+/* Disabled buttons (both generic and specific if they become disabled) */
+.controls button:disabled {
+    opacity: 0.5; /* General opacity for disabled state */
+    cursor: not-allowed;
+    background: rgba(100,100,100,0.1); /* Neutral, flat background */
+    box-shadow: none;
+    border-color: rgba(120,120,120,0.2);
+    color: rgba(235,235,245,0.4);
+    transform: translateY(0) scale(1); /* Reset transforms */
+}
+
+.task-input {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.task-input input[type="text"] {
+    width: calc(100% - 36px); /* padding L+R */
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    background-color: rgba(30, 30, 32, 0.7);
+    color: var(--text-color-primary);
+    font-size: 1em;
+    text-align: center;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.task-input input[type="text"]::placeholder {
+    color: var(--text-color-secondary);
+}
+
+.task-input input[type="text"]:focus::placeholder {
+    color: transparent; /* Hide placeholder on focus */
+}
+
+.task-input input[type="text"]:focus {
+    outline: none;
+    background-color: rgba(35, 35, 38, 0.8);
+    border-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.7);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 0 10px rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.3);
+}
+
+.counters {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+    line-height: 1.4;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+
+/* Mode-specific variables */
+body.work-mode {
+    --current-glow-color-rgb: var(--work-glow-color-rgb);
+    --current-timer-color: #30D158;
+    --current-timer-glow: rgba(var(--work-glow-color-rgb), 0.5);
+    --current-glow-shadow: rgba(var(--work-glow-color-rgb), 0.15);
+}
+body.short-break-mode {
+    --current-glow-color-rgb: var(--short-break-glow-color-rgb);
+    --current-timer-color: #0A84FF;
+    --current-timer-glow: rgba(var(--short-break-glow-color-rgb), 0.5);
+    --current-glow-shadow: rgba(var(--short-break-glow-color-rgb), 0.15);
+}
+body.long-break-mode {
+    --current-glow-color-rgb: var(--long-break-glow-color-rgb);
+    --current-timer-color: #FF9F0A;
+    --current-timer-glow: rgba(var(--long-break-glow-color-rgb), 0.5);
+    --current-glow-shadow: rgba(var(--long-break-glow-color-rgb), 0.15);
+}
+
+/* Specific button colors still rely on IDs for simplicity here, but could use variables too */
+body.work-mode .controls button#start:not(:disabled) { background: #30D158; color: #000; border-color: #30D158; }
+body.short-break-mode .controls button#start:not(:disabled) { background: #0A84FF; color: #fff; border-color: #0A84FF;}
+body.long-break-mode .controls button#start:not(:disabled) { background: #FF9F0A; color: #000; border-color: #FF9F0A;}
+
+#pause:not(:disabled) { background: #FF453A; color: white; border-color: #FF453A;}
+#reset { background: #8E8E93; color: white; border-color: #8E8E93;}
+
+.controls button#start:disabled {
+    background-color: rgba(142, 142, 147, 0.2);
+    color: rgba(235, 235, 245, 0.3);
+    border-color: rgba(142, 142, 147, 0.3);
+}
+
+/* --- Duration Settings Display/Edit --- */
+.duration-settings {
+    display: flex;
+    justify-content: space-around; /* Evenly space out the duration items */
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    /* margin-top: 15px; */ /* Removed */
+    /* margin-bottom: 5px; */ /* Removed */
+    border-top: 1px solid rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.15);
+    border-bottom: 1px solid rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.15);
+}
+
+.duration-label {
+    font-size: 0.85em;
+    color: var(--text-color-secondary);
+    cursor: pointer; /* Indicate they are clickable */
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.duration-label:hover {
+    background-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.1);
+    color: var(--text-color-primary);
+}
+
+.editable-duration {
+    font-weight: 600; /* Make the number bold */
+    color: var(--text-color-primary);
+    padding: 2px 4px;
+    border-radius: 4px;
+    /* transition for if we want to highlight it on mode change later */
+}
+
+/* Style for the temporary input field during editing */
+.duration-input-active {
+    width: 45px; /* Adjusted width */
+    padding: 6px 0px; /* Adjusted padding, no horizontal for cleaner look with text-align */
+    border-radius: 8px;
+    border: 1px solid rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.5);
+    background-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.15); /* Slightly more opaque */
+    color: var(--text-color-primary);
+    font-size: 1em; /* Match the parent font size */
+    font-weight: 600; /* Match the editable-duration span font weight */
+    text-align: center;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 0 5px rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.2);
+    -moz-appearance: textfield; /* Firefox - hide arrows */
+    appearance: textfield; /* Standard - hide arrows */
+}
+
+/* Hide arrows for Chrome, Safari, Edge */
+.duration-input-active::-webkit-outer-spin-button,
+.duration-input-active::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.duration-input-active:focus {
+    outline: none;
+    border-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.8);
+    background-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.2);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 10px rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.4);
+}
+
+/* --- Current Task Display --- */
+.current-task-display {
+    min-height: 2em; /* Ensure space even if no task, prevents layout jump */
+    text-align: center;
+    /* margin-top: 20px; */ /* Removed */
+    /* margin-bottom: -10px; */ /* Removed */
+}
+
+#active-task-name {
+    font-size: 1.2em;
+    color: var(--text-color-primary);
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background-color: rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.1);
+    border: 1px solid rgba(var(--current-glow-color-rgb, var(--default-glow-color-rgb)), 0.2);
+    display: inline-block; /* To allow padding and background */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out; /* Added background-color and border-color transitions */
+    /* Base state for animation */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+#active-task-name.task-appear {
+    animation: activeTaskAppear 0.5s ease-out forwards;
+}
+
+#active-task-name:empty {
+    display: none; /* Hide if no active task */
+}
+
+.task-input {
+    /* margin-bottom: 0; */ /* Already 0 or handled by gap */
+    width: 100%;
+    /* margin-top: 15px; */ /* Removed, handled by container gap */
+}
+
+/* If an active task is displayed, adjust margin for the input field below it */
+/* Rule removed as gap should handle spacing, and selector was incorrect
+#active-task-name:not(:empty) + .task-input {
+    margin-top: 10px;
+}
+*/
+#active-task-name:not(:empty) ~ .task-input input[type="text"]{
+    /* Optionally, make the input field slightly less prominent if a task is active */
+    /* background-color: rgba(30, 30, 32, 0.6); */
+}
+
+.task-input input[type="text"] {
+    width: calc(100% - 36px); 
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; 
+    background-color: rgba(30, 30, 32, 0.7);
+    color: var(--text-color-primary);
+    font-size: 1em;
+    text-align: center;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+} 
